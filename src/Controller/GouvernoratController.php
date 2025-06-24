@@ -2,11 +2,13 @@
 
 namespace App\Controller;
 
+use App\Entity\City;
 use App\Entity\Gouvernorat;
 use App\Form\GouvernoratType;
 use App\Repository\GouvernoratRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -19,6 +21,21 @@ final class GouvernoratController extends AbstractController{
         return $this->render('gouvernorat/index.html.twig', [
             'gouvernorats' => $gouvernoratRepository->findAll(),
         ]);
+    }
+    #[Route('/cities/{id}', name: 'gou_cities', methods: ['GET'])]
+    public function gouvCities(Gouvernorat $gouvernorat = null, GouvernoratRepository $gouvernoratRepository): Response
+    {
+        if (!$gouvernorat) return $this->json([]);
+        return $this->json($this->cityFormatter($gouvernorat->getCities()));
+    }
+
+    private function cityFormatter($cities)
+    {
+        $response = [];
+        foreach ($cities as $city) {
+            $response[] = ['id' => $city->getId(), 'name' => $city->getName()];
+        }
+        return $response;
     }
 
     #[Route('/new', name: 'app_gouvernorat_new', methods: ['GET', 'POST'])]

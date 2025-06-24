@@ -25,7 +25,7 @@ final class AnnonceController extends AbstractController{
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $annonce = new Annonce();
-        $form = $this->createForm(AnnonceType::class, $annonce);
+        $form = $this->createForm(AnnonceType::class, $annonce,['action' => $this->generateUrl('app_annonce_new')]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

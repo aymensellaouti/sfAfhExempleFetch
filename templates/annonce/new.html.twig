@@ -9,3 +9,73 @@
 
     <a href="{{ path('app_annonce_index') }}">back to list</a>
 {% endblock %}
+
+{% block javascripts %}
+    <script>
+        const form = document.getElementById('annonce_form');
+        console.log({form});
+        const form_select_gouvernorat = document.getElementById('annonce_gouvernorat');
+        const form_select_city = document.getElementById('annonce_city');
+        console.log({form_select_city, form_select_gouvernorat});
+        // Méthode de mise à jour du formulaire
+        // gouvCities/{id}
+        const updateForm = async (data, url, method) => {
+            console.log({url});
+            const req = await fetch(url, {
+                method: method,
+                body: data,
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'charset': 'utf-8'
+                }
+            });
+
+            const text = await req.text();
+
+            return text;
+        };
+
+        const parseTextToHtml = (text) => {
+            const parser = new DOMParser();
+            const html = parser.parseFromString(text, 'text/html');
+
+            return html;
+        };
+
+        const changeOptions = async (e) => {
+            console.log({target: e.target})
+            const requestBody = e.target.getAttribute('name') + '=' + e.target.value;
+            console.log({requestBody});
+            const updateFormResponse = await updateForm(requestBody, form.getAttribute('action'), form.getAttribute('method'));
+            const html = parseTextToHtml(updateFormResponse);
+
+            const new_form_select_position = html.getElementById('annonce_city');
+            form_select_city.innerHTML = new_form_select_position.innerHTML;
+        };
+        const feedSelect = (elements, target) => {
+            console.log('Feeding select')
+            elements.forEach((item, index) => {
+                target.innerHTML+= `
+                <option value="${item.id}">${item.name}</option>`
+            });
+        }
+        form_select_gouvernorat.addEventListener('change', (e) => changeOptions(e));
+        /** only js */
+        // form_select_gouvernorat.addEventListener('change', async (e) =>
+        // {
+        //     const requestBody = e.target.getAttribute('name') + '=' + e.target.value;
+        //     console.log({requestBody});
+        //     const url = `/gouv/cities/${e.target.value}`;
+        //     console.log({url});
+        //     const citiesList = await fetch(url, {
+        //         method: 'GET',
+        //         headers: {
+        //             "Content-Type": "application/json",
+        //         }
+        //     });
+        //     cities = await citiesList.json();
+        //     console.log({cities})
+        //     feedSelect(cities, form_select_city);
+        // });
+    </script>
+{% endblock %}

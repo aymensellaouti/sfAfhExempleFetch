@@ -21,7 +21,7 @@ class Gouvernorat
     /**
      * @var Collection<int, City>
      */
-    #[ORM\OneToMany(targetEntity: City::class, mappedBy: 'gouvernorat')]
+    #[ORM\OneToMany(targetEntity: City::class, mappedBy: 'gouvernorat', cascade: ['persist'])]
     private Collection $cities;
 
     /**

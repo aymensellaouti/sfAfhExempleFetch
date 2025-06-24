@@ -23,7 +23,7 @@ class AnnonceType extends AbstractType
             ->add('gouvernorat', EntityType::class, [
                 'class' => Gouvernorat::class,
                 'choice_label' => 'name',
-                'placeholder' => 'Ville (Choisir un gouvernorat)',
+//                'placeholder' => 'Ville (Choisir un gouvernorat)',
             ])
             ->add('city', EntityType::class, [
                 'class' => City::class,
@@ -31,8 +31,10 @@ class AnnonceType extends AbstractType
                 'placeholder' => 'Département (Choisir une région)',
             ]);
 
-        $formModifier = function (FormInterface $form, Gouvernorat $gouvernorat = null) {
-            $cities = (null === $gouvernorat) ? [] : $gouvernorat->getCities();
+        $formModifier = function (FormInterface $form, ?Gouvernorat $gouvernorat = null) {
+            dump($gouvernorat);
+            $cities = (null === $gouvernorat) ? [] :
+                $gouvernorat->getCities();
             $form->add('city', EntityType::class, [
                 'class' => City::class,
                 'choices' => $cities,
@@ -45,11 +47,12 @@ class AnnonceType extends AbstractType
         };
 
         $builder->addEventListener(
-            FormEvents::PRE_SET_DATA,
+            FormEvents::POST_SET_DATA,
             function (FormEvent $event) use ($formModifier): void {
                 // this would be your entity, i.e. SportMeetup
                 $data = $event->getData();
-
+                dump($data);
+                dump($data->getGouvernorat());
                 $formModifier($event->getForm(), $data->getGouvernorat());
             }
         );
